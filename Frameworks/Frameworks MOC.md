@@ -32,6 +32,5 @@ tags:
 - [[Phoenix (Arize)]]
 
 ## 相关页面
-- [[RAG MOC|RAG]]
 - [[Agents MOC|Agent 与工具]]
 - [[Deployment MOC|部署推理]]

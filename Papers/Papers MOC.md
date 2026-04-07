@@ -23,11 +23,6 @@ tags:
 - [[Let's Verify Step by Step]]
 - [[DeepSeek R1 技术报告]]
 
-## RAG 与检索
-- [[RAG 原始论文]]
-- [[Self-RAG]]
-- [[GraphRAG]]
-
 ## 待读列表
 
 ```dataview

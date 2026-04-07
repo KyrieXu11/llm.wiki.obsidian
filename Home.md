@@ -20,7 +20,6 @@ tags:
 
 ### 应用实践
 - [[Prompting MOC|Prompt 工程]] — 提示词设计与优化技巧
-- [[RAG MOC|RAG 检索增强生成]] — 检索增强生成架构与实践
 - [[Agents MOC|Agent 与工具]] — AI Agent 架构、Function Calling、MCP
 
 ### 工程部署

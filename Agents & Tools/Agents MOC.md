@@ -23,6 +23,7 @@ tags:
 
 ## 沙箱集成
 - [[OpenSandbox 沙箱后端集成]]
+- [[Landlock Agent 沙箱实践]]
 
 ## 应用场景
 - [[代码助手 Agent]]

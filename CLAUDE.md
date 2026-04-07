@@ -9,7 +9,6 @@ Home.md                         — 首页知识地图
 Models/Models MOC.md            — 模型总览（GPT、Claude、Llama、Qwen、DeepSeek...）
 Prompting/Prompting MOC.md      — Prompt 工程（CoT、ReAct、Few-shot...）
 Fine-tuning/Fine-tuning MOC.md  — 微调训练（SFT、LoRA、RLHF、DPO...）
-RAG/RAG MOC.md                  — 检索增强生成（向量库、Chunking...）
 Agents & Tools/Agents MOC.md    — Agent 架构、Function Calling、MCP
 Deployment/Deployment MOC.md    — 部署推理、量化优化
 Evaluation/Evaluation MOC.md    — 评测基准（MMLU、HumanEval...）
