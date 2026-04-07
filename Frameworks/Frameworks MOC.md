@@ -33,4 +33,4 @@ tags:
 
 ## 相关页面
 - [[Agents MOC|Agent 与工具]]
-- [[Deployment MOC|部署推理]]
+- [[Infra MOC|基础设施]]

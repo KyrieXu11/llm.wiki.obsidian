@@ -185,6 +185,12 @@
   },
   "active": "a1b8d9e1f83c3257",
   "lastOpenFiles": [
+    "Infra/Docker 网络模式与旁路由.md",
+    "Infra/Infra MOC.md",
+    "Infra/opensandbox-deploy-guide.md",
+    "Infra/Landlock LSM.md",
+    "Infra/Deployment MOC.md",
+    "Infra",
     "Deployment/opensandbox-deploy-guide.md",
     "Agents & Tools/Claude Code 凭据存储机制.md",
     "Deployment/Landlock LSM.md",

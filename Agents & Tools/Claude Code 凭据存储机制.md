@@ -110,12 +110,12 @@ security add-generic-password -U -s "Claude Code-credentials" -a "$USER" -w "$CR
 
 ## 平台差异
 
-| 项目 | macOS | Linux / WSL |
-|------|-------|-------------|
-| OAuth 令牌存储 | Keychain（加密） | `~/.claude/.credentials.json`（文件权限 600） |
-| 账户元信息 | `~/.claude.json` | `~/.claude.json` |
-| 读取令牌 | `security find-generic-password -s "Claude Code-credentials" -w` | `cat ~/.claude/.credentials.json` |
-| 写入令牌 | `security add-generic-password -U -s ... -w ...` | 直接写文件 + `chmod 600` |
+| 项目         | macOS                                                            | Linux / WSL                             |
+| ---------- | ---------------------------------------------------------------- | --------------------------------------- |
+| OAuth 令牌存储 | Keychain（加密）                                                     | `~/.claude/.credentials.json`（文件权限 600） |
+| 账户元信息      | `~/.claude.json`                                                 | `~/.claude.json`                        |
+| 读取令牌       | `security find-generic-password -s "Claude Code-credentials" -w` | `cat ~/.claude/.credentials.json`       |
+| 写入令牌       | `security add-generic-password -U -s ... -w ...`                 | 直接写文件 + `chmod 600`                     |
 
 ## 账号切换原理
 

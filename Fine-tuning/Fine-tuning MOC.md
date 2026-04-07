@@ -26,4 +26,4 @@ tags:
 ## 相关页面
 - [[Models MOC|模型总览]]
 - [[Evaluation MOC|评测基准]]
-- [[Deployment MOC|部署推理]]
+- [[Infra MOC|基础设施]]

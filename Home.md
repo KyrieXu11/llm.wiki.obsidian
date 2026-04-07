@@ -24,7 +24,7 @@ tags:
 
 ### 工程部署
 - [[Fine-tuning MOC|微调训练]] — SFT、RLHF、LoRA 等微调方法
-- [[Deployment MOC|部署推理]] — 模型部署、推理优化、量化
+- [[Infra MOC|基础设施]] — 部署推理、网络、Docker、沙箱隔离
 - [[Frameworks MOC|工具框架]] — LangChain、LlamaIndex、vLLM 等
 
 ### 前沿研究
