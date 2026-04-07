@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Deployment/opensandbox-deploy-guide.md",
+                "file": "Agents & Tools/OpenSandbox 沙箱后端集成.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "opensandbox-deploy-guide"
+              "title": "OpenSandbox 沙箱后端集成"
             }
           }
         ]
@@ -185,15 +185,23 @@
   },
   "active": "a1b8d9e1f83c3257",
   "lastOpenFiles": [
-    "Agents & Tools/Landlock Agent 沙箱实践.md",
-    "Deployment/Landlock LSM.md",
-    "Deployment/Deployment MOC.md",
-    "Agents & Tools/OpenSandbox 沙箱后端集成.md",
-    "Agents & Tools/Agents MOC.md",
-    "Deployment/opensandbox-deploy-guide.md",
-    "Frameworks/Deep Agents.md",
+    "Agents & Tools/coding/langchain-opensandbox/test_integration.py",
     "Home.md",
     "CLAUDE.md",
+    "Agents & Tools/OpenSandbox 沙箱后端集成.md",
+    "Agents & Tools/Landlock Agent 沙箱实践.md",
+    "Agents & Tools/Agents MOC.md",
+    "Agents & Tools/coding/langchain-opensandbox/test_sandbox.py",
+    "Agents & Tools/coding/langchain-opensandbox/pyproject.toml",
+    "Agents & Tools/coding/langchain-opensandbox/__init__.py",
+    "Agents & Tools/coding/langchain-opensandbox/provider.py",
+    "Agents & Tools/coding/langchain-opensandbox/sandbox.py",
+    "Agents & Tools/coding/langchain-opensandbox",
+    "Agents & Tools/coding",
+    "Deployment/opensandbox-deploy-guide.md",
+    "Deployment/Landlock LSM.md",
+    "Deployment/Deployment MOC.md",
+    "Frameworks/Deep Agents.md",
     "Frameworks/Frameworks MOC.md",
     "Papers/Papers MOC.md",
     "Templates/工具框架模板.md",
