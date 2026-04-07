@@ -25,13 +25,13 @@ Landlock 是 Linux 内核自 5.13（2021 年 6 月）起内置的安全模块（
 
 ## 解决的问题
 
-| 传统方案 | 痛点 |
-|---------|------|
-| SELinux / AppArmor | 需要 root 配置策略，应用无法自我限制 |
-| seccomp-BPF | 只能过滤 syscall 号，无法区分文件路径 |
+| 传统方案               | 痛点                           |
+| ------------------ | ---------------------------- |
+| SELinux / AppArmor | 需要 root 配置策略，应用无法自我限制        |
+| seccomp-BPF        | 只能过滤 syscall 号，无法区分文件路径      |
 | bubblewrap (bwrap) | 依赖 user namespaces，非特权容器中不可用 |
-| chroot | 需要 root |
-| Docker/容器 | 粒度太粗，容器内多 session 无法互隔离 |
+| chroot             | 需要 root                      |
+| Docker/容器          | 粒度太粗，容器内多 session 无法互隔离      |
 
 Landlock 填补了 "**应用层自主、路径级粒度、非特权可用**" 的空白。
 

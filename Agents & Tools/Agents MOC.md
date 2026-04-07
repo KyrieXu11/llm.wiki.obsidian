@@ -20,6 +20,7 @@ tags:
 - [[CrewAI]]
 - [[AutoGen]]
 - [[Claude Code]]
+- [[Claude Code 凭据存储机制]]
 
 ## 沙箱集成
 - [[OpenSandbox 沙箱后端集成]]
