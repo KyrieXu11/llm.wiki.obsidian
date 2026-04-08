@@ -11,6 +11,7 @@ tags:
 ## 部署推理
 - [[Deployment MOC|部署推理总览]]
 - [[opensandbox-deploy-guide|OpenSandbox 部署指南]]
+- [[Kubernetes SubPath 与 PVC 创建]]
 - [[Landlock LSM]]
 
 ## 网络
