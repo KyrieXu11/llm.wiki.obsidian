@@ -640,7 +640,150 @@ OpenSandbox Minikube 部署验证
 
 ---
 
-## 7. 参考链接
+## 7. Volume 挂载
+
+OpenSandbox 原生支持在创建沙箱时挂载外部存储（OSEP-0003），避免每次重新上传文件。
+
+### 7.1 API
+
+`POST /v1/sandboxes` 的请求体中通过 `volumes` 数组指定挂载：
+
+```json
+{
+  "image": {"uri": "python:3.11"},
+  "timeout": 600,
+  "volumes": [
+    {
+      "name": "workdir",
+      "host": {"path": "/data/sessions/abc123"},
+      "mountPath": "/mnt/work",
+      "subPath": "task-001",
+      "readOnly": false
+    }
+  ]
+}
+```
+
+每个 volume 项包含：
+
+| 字段 | 必填 | 说明 |
+|------|------|------|
+| `name` | 是 | DNS-label 标识符，sandbox 内唯一 |
+| `mountPath` | 是 | 容器内挂载路径（绝对路径） |
+| `readOnly` | 否 | 默认 `false` |
+| `subPath` | 否 | 后端路径下的相对子目录 |
+| 后端（三选一） | 是 | `host` / `pvc` / `ossfs`，互斥 |
+
+### 7.2 三种后端
+
+| 后端 | 字段 | Docker | K8s | 适用场景 |
+|------|------|--------|-----|---------|
+| `host` | `host.path` | bind mount | hostPath | 单节点 / 开发环境 |
+| `pvc` | `pvc.claimName` | Docker named volume | PersistentVolumeClaim | 多节点 K8s 生产环境 |
+| `ossfs` | `ossfs.bucket`, `ossfs.endpoint`, `ossfs.accessKeyId`, `ossfs.accessKeySecret` | Linux FUSE | 计划 CSI | 阿里云 OSS 对象存储 |
+
+### 7.3 安全控制
+
+- **Host path 白名单**：服务端配置 `storage.allowed_host_paths` 限制可挂载的宿主机路径前缀
+- **Path traversal 防护**：`subPath` 拒绝 `..` 和绝对路径
+- **PVC 需预创建**：不会自动创建 Docker volume 或 K8s PVC
+- **OSSFS 注入防护**：bucket 名称和 endpoint 会校验 shell 元字符
+
+### 7.4 Python SDK 示例
+
+```python
+from opensandbox.api.lifecycle.models.volume import Volume
+from opensandbox.api.lifecycle.models.host import Host
+from opensandbox.api.lifecycle.models.pvc import PVC
+
+sandbox = await Sandbox.create(
+    "python:3.11",
+    timeout=timedelta(minutes=10),
+    volumes=[
+        Volume(name="workdir", host=Host(path="/data/user"), mount_path="/mnt/work"),
+        Volume(name="models", pvc=PVC(claim_name="shared-models"),
+               mount_path="/mnt/models", read_only=True),
+    ],
+)
+```
+
+> 相关设计文档：`oseps/0003-volume-and-volumebinding-support.md`
+
+---
+
+## 8. 生命周期管理
+
+### 8.1 状态机
+
+```
+Pending → Running → Stopping → Terminated
+              ↓          ↑
+           Pausing    (kill / TTL 到期)
+              ↓
+           Paused → Running (resume)
+
+任意状态 → Failed（遇到不可恢复错误时）
+```
+
+状态通过 `GET /sandboxes/{id}` 返回的 `status` 对象获取：
+
+```json
+{
+  "state": "Running",
+  "reason": "user_delete | ttl_expiry | provision_timeout | runtime_error",
+  "message": "...",
+  "lastTransitionAt": "2026-04-08T10:00:00Z"
+}
+```
+
+### 8.2 TTL 与续期
+
+**创建时设置 TTL：**
+
+```json
+{"timeout": 600}
+```
+
+到期后自动销毁。Docker 模式使用 `threading.Timer` 调度，K8s 模式由 controller 根据 `spec.expireTime` 调谐。
+
+**续期 API：**
+
+```bash
+POST /sandboxes/{id}/renew-expiration
+Content-Type: application/json
+
+{"expiresAt": "2026-04-08T11:00:00Z"}
+```
+
+- 续期次数无限制
+- 约束：新过期时间必须在当前之后，且不超过 `max_sandbox_timeout_seconds`（服务端配置）
+- Docker 模式下会取消旧 Timer 并创建新的
+- K8s 模式下更新 `spec.expireTime`，controller 自动调谐
+
+**自动续期（OSEP-0009 Renew-on-Access）：**
+
+创建沙箱时设置扩展参数 `access.renew.extend.seconds`（范围 300~86400），每次访问沙箱时自动延期指定秒数。通过 ingress 网关 + Redis renew intent 队列实现。
+
+### 8.3 Pause/Resume（K8s，OSEP-0008，implementing）
+
+| 操作                            | 说明                                                                       |
+| ----------------------------- | ------------------------------------------------------------------------ |
+| `POST /sandboxes/{id}/pause`  | rootfs 快照为 OCI 镜像 → 推送至 registry → 删除原 Pod。状态：Running → Pausing → Paused |
+| `POST /sandboxes/{id}/resume` | 从快照镜像创建新 Pod，`sandboxId` 不变。状态：Paused → Resuming → Running               |
+
+
+适用于请求间隔较长的场景，释放计算资源但保留文件系统状态。Docker 模式下 pause/resume 仅冻结 cgroup（非快照），返回 501。
+
+### 8.4 注意事项
+
+- **无空闲检测**：sandbox 不会因为没有命令执行就自动回收，只有 TTL 到期或主动 DELETE 才会销毁
+- **无 webhook 回调**：sandbox 终止时没有主动通知，需轮询 `GET /sandboxes/{id}` 检查状态
+- **手动清理模式**：创建时设 `SANDBOX_MANUAL_CLEANUP_LABEL` 可跳过 TTL，必须主动删除
+- **失败 sandbox 清理**：Pending 状态失败的 sandbox 默认 1 小时后自动清理（`PENDING_FAILURE_TTL` 环境变量控制）
+
+---
+
+## 9. 参考链接
 
 - 项目地址：https://github.com/alibaba/OpenSandbox
 - 配置详解：`server/configuration.md`

@@ -30,6 +30,32 @@ Assets/                         — 附件存放
 
 每个分类文件夹都有一个 MOC 文件作为该领域的导航入口。新增笔记后需要在对应 MOC 中添加 wikilink。
 
+## 查询方式
+
+优先使用 Obsidian CLI 而非文件系统的 Grep/Glob 查询 wiki 内容：
+
+```bash
+# 全文搜索（利用 Obsidian 内置索引，比 Grep 更快）
+obsidian vault="llm.wiki" search query="关键词" format=json
+
+# 带上下文的搜索（返回匹配行号和内容）
+obsidian vault="llm.wiki" search:context query="关键词" limit=5 format=json
+
+# 按笔记名读取（wikilink 风格，无需完整路径）
+obsidian vault="llm.wiki" read file="笔记名"
+
+# 反向链接查询
+obsidian vault="llm.wiki" backlinks file="笔记名"
+
+# 标签列表
+obsidian vault="llm.wiki" tags
+
+# 属性查询
+obsidian vault="llm.wiki" property:get name="属性名" file="笔记名"
+```
+
+只在需要正则匹配或 Obsidian 未运行时回退到 Grep/Glob。
+
 ## 插件
 
 - Dataview：首页使用 dataview 查询展示最近更新和分类统计

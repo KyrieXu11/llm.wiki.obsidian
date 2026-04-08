@@ -4,21 +4,21 @@
     "type": "split",
     "children": [
       {
-        "id": "2fe8bd7028a95068",
+        "id": "cef2a4d3e6d97301",
         "type": "tabs",
         "children": [
           {
-            "id": "a1b8d9e1f83c3257",
+            "id": "3145e101795059b8",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Agents & Tools/Claude Code 凭据存储机制.md",
+                "file": "CLAUDE.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Claude Code 凭据存储机制"
+              "title": "CLAUDE"
             }
           }
         ]
@@ -78,7 +78,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 217.5
+    "width": 261.5
   },
   "right": {
     "id": "ed4eaa83d3325dbe",
@@ -183,23 +183,27 @@
       "bases:新建数据库": false
     }
   },
-  "active": "a1b8d9e1f83c3257",
+  "active": "3145e101795059b8",
   "lastOpenFiles": [
-    "Infra/Docker 网络模式与旁路由.md",
-    "Infra/Infra MOC.md",
+    "Home.md",
+    "Templates/笔记模板.md",
+    "未命名.base",
     "Infra/opensandbox-deploy-guide.md",
+    "Infra/Infra MOC.md",
+    "Infra/Docker 网络模式与旁路由.md",
+    "Agents & Tools/OpenSandbox Session 沙箱复用实践.md",
+    "Agents & Tools/Agents MOC.md",
+    "Agents & Tools/OpenSandbox 沙箱后端集成.md",
+    "Agents & Tools/Landlock Deep Agents 后端集成.md",
     "Infra/Landlock LSM.md",
     "Infra/Deployment MOC.md",
+    "Agents & Tools/Claude Code 凭据存储机制.md",
     "Infra",
     "Deployment/opensandbox-deploy-guide.md",
-    "Agents & Tools/Claude Code 凭据存储机制.md",
     "Deployment/Landlock LSM.md",
-    "Agents & Tools/OpenSandbox 沙箱后端集成.md",
     "Agents & Tools/coding/langchain-opensandbox/test_integration.py",
-    "Home.md",
     "CLAUDE.md",
     "Agents & Tools/Landlock Agent 沙箱实践.md",
-    "Agents & Tools/Agents MOC.md",
     "Agents & Tools/coding/langchain-opensandbox/test_sandbox.py",
     "Agents & Tools/coding/langchain-opensandbox/pyproject.toml",
     "Agents & Tools/coding/langchain-opensandbox/__init__.py",
@@ -212,8 +216,6 @@
     "Frameworks/Frameworks MOC.md",
     "Papers/Papers MOC.md",
     "Templates/工具框架模板.md",
-    "Templates/论文笔记模板.md",
-    "Templates/笔记模板.md",
-    "未命名.base"
+    "Templates/论文笔记模板.md"
   ]
 }
