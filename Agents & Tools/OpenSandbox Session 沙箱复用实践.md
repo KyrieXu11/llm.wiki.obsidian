@@ -12,6 +12,15 @@ aliases:
 
 # OpenSandbox Session 沙箱复用实践
 
+## 结论
+
+**可以支持，但要分两层理解：**
+
+1. **OpenSandbox 原生支持在创建 sandbox 时动态传入 `volumes`**，所以你完全可以在业务层根据 `session_id` 生成不同的 `host.path`、`pvc.claimName` 或 `subPath`。
+2. **OpenSandbox 不内建 `session_id` 语义**，不会自动帮你维护“同一个 session 应该挂哪个目录/PVC、复用哪个 sandbox”。这部分需要业务层自己维护 `session_id -> sandbox_id / storage` 映射。
+
+一句话说：**OpenSandbox 支持“按 session_id 动态挂载”，但这是 request-time 的动态参数能力，不是平台内建的 Session Mount 功能。**
+
 ## 问题背景
 
 在多轮对话的 Agent 场景中（如合同审查、代码分析），一个 chat session 往往跨越多次请求：
@@ -165,6 +174,120 @@ async def cleanup_session(session_id: str):
 ```
 
 多节点场景下需使用 `ReadWriteMany` 的 StorageClass（如 NFS、CephFS），或确保同一 session 的 sandbox 调度到同一节点。
+
+### 原方案的优化
+
+原方案是：**每个 `session_id` 创建一个 PVC，再挂到 sandbox**。
+
+更推荐的优化是：**共享 PVC + `subPath=session_id` + sandbox 复用**。
+
+```python
+"volumes": [{
+    "name": "session-data",
+    "pvc": {"claimName": "agent-session-data"},
+    "mountPath": "/mnt/work",
+    "subPath": f"sessions/{session_id}",
+}]
+```
+
+核心变化：
+
+- PVC 不再按 session 创建，而是长期复用一个或少量共享 PVC
+- session 隔离从“PVC 级别”下沉到“目录级别”
+- sandbox 挂掉后，只要重新挂回同一 `subPath`，文件仍可复用
+
+### 原方案的局限
+
+`session_id -> PVC` 的方案主要问题是：
+
+1. PVC/PV 数量会随 session 线性增长，给 K8s 控制面和存储系统增加压力
+2. session 结束后的 PVC 回收、残留治理比较麻烦
+3. 对 chat 这类短周期请求来说，存储资源粒度过细，成本高于收益
+
+因此，更适合把 PVC 当作**共享存储池**，而不是 **session 级资源**。
+
+### `subPath` 特性介绍
+
+`subPath` 是 Kubernetes `volumeMounts` 的原生能力，用来把一个 volume 中的**某个子目录**挂载到容器内。
+
+例如：
+
+- 共享 PVC：`agent-session-data`
+- session A 挂载 `sessions/a`
+- session B 挂载 `sessions/b`
+
+这样多个 session 可以复用同一个 PVC，但在各自独立目录下工作。
+
+`subPath` 适合这个场景的原因：
+
+1. 避免为每个 session 单独创建 PVC
+2. 仍然能做到 session 级目录隔离
+3. sandbox 重建后可以重新挂回同一目录
+
+需要注意：
+
+- `subPath` 解决的是**目录隔离**，不是**并发控制**
+- 它不会自动提供 session 语义，`session_id -> sandbox_id` 仍需业务层维护
+- 共享 PVC 的清理粒度通常是删除目录，不是删除 PVC
+
+### `subPath` 使用方式
+
+K8s 原生写法示意：
+
+```yaml
+volumes:
+  - name: session-data
+    persistentVolumeClaim:
+      claimName: agent-session-data
+
+containers:
+  - name: sandbox
+    volumeMounts:
+      - name: session-data
+        mountPath: /mnt/work
+        subPath: sessions/session-123
+```
+
+OpenSandbox 对应的请求参数可写成：
+
+```json
+{
+  "volumes": [
+    {
+      "name": "session-data",
+      "pvc": { "claimName": "agent-session-data" },
+      "mountPath": "/mnt/work",
+      "subPath": "sessions/session-123"
+    }
+  ]
+}
+```
+
+推荐目录约定：
+
+```text
+sessions/<session_id>/
+  input/
+  workspace/
+  output/
+```
+
+在业务层的典型用法是：
+
+1. 根据 `session_id` 计算 `subPath`
+2. 查询是否已有可复用的 sandbox
+3. 没有则创建新 sandbox，并挂载共享 PVC + 对应 `subPath`
+4. 有则直接复用并续期
+5. session 结束后删除 `sessions/<session_id>/` 目录
+
+### 设计边界与注意事项
+
+- `host` / `hostPath` 更适合单机或开发环境；K8s 多节点生产优先用 `pvc`
+- 如果用 `hostPath`，OpenSandbox 服务端要允许对应的宿主机路径前缀
+- 如果用 `pvc`，PVC 必须预先存在，而且要和 sandbox 在同一 namespace
+- `subPath` 解决的是路径隔离，不解决并发写冲突；同一目录被多个 sandbox 同时读写时，锁和一致性要业务层自己处理
+- 如果你只复用文件，不复用进程内状态，那么 sandbox 挂掉也没关系；新 sandbox 挂回同一 volume 即可继续
+- 如果你还想复用 Python 变量、缓存、已启动进程等内存态，就还需要维护 `session_id -> sandbox_id` 并配合 TTL/续期
 
 ## 相关页面
 
