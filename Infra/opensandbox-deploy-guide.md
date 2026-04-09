@@ -294,7 +294,45 @@ minikube image load <your-python-image>
 
 创建沙箱时使用已导入的镜像即可。
 
-**问题五：SDK `metadata: null` 解析崩溃**
+**问题五：本机 `docker images` 有镜像，但 Minikube 仍然 `ImagePullBackOff`**
+
+现象：
+
+- 宿主机执行 `docker images` 能看到 `opensandbox/code-interpreter:v1.0.2`
+- 但沙箱 Pod 仍报 `ErrImagePull` / `ImagePullBackOff`
+
+原因：
+
+- Kubernetes 使用的是 **Minikube 节点运行时**（containerd/cri-o）的镜像缓存，而不是宿主机 Docker Desktop 的本地缓存
+- 即使 Pod 的 `imagePullPolicy: IfNotPresent`，只要节点本地没有镜像，仍会去远端仓库拉取
+
+排查命令：
+
+```bash
+# 1) 看 Pod 实际拉取策略与镜像名
+kubectl get pod -n opensandbox-system <sandbox-pod> \
+  -o jsonpath='{.spec.containers[?(@.name=="sandbox")].imagePullPolicy}{"\n"}{.spec.containers[?(@.name=="sandbox")].image}{"\n"}'
+
+# 2) 看节点事件是否为拉取失败
+kubectl describe pod -n opensandbox-system <sandbox-pod> | grep -E "ErrImagePull|ImagePullBackOff|Failed to pull image"
+
+# 3) 看 minikube 节点运行时里是否真的有该镜像
+minikube ssh -- "sudo crictl images | grep 'opensandbox/code-interpreter' || true"
+```
+
+解决方法：
+
+```bash
+# 把宿主机镜像导入 minikube 节点
+minikube image load opensandbox/code-interpreter:v1.0.2
+
+# 再次确认节点中可见
+minikube ssh -- "sudo crictl images | grep 'opensandbox/code-interpreter' || true"
+```
+
+如果你的 OpenSandbox 跑在非 minikube 集群，也需要把镜像同步到对应集群节点，或改用可访问的私有镜像仓库。
+
+**问题六：SDK `metadata: null` 解析崩溃**
 
 使用 Python SDK 的 `Sandbox.create()` 创建沙箱时，Server 返回 `"metadata": null`，但 SDK 尝试将其作为 dict 解析导致报错：
 
@@ -396,7 +434,7 @@ export OPENSANDBOX_SERVER_URL=http://localhost:8090
 
 ### 6.1 Kubernetes 端到端验证（REST API）
 
-由于 SDK 存在兼容性问题（见 3.8 问题五），K8s 部署建议使用 REST API 进行端到端验证。以下命令均已在本地 Minikube 环境实际验证通过。
+由于 SDK 存在兼容性问题（见 3.8 问题六），K8s 部署建议使用 REST API 进行端到端验证。以下命令均已在本地 Minikube 环境实际验证通过。
 
 **第一步：创建沙箱**
 

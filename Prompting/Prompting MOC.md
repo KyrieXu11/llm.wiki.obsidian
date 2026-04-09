@@ -18,6 +18,7 @@ tags:
 - [[ReAct 框架]]
 - [[Self-Consistency]]
 - [[Prompt Chaining]]
+- [[Context Management|上下文管理]] — Context Engineering、压缩、缓存等策略
 
 ## 实用模板
 - [[代码生成 Prompt 模板]]
