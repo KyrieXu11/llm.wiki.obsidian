@@ -14,6 +14,10 @@ tags:
 - [[Ollama]]
 - [[llama.cpp]]
 
+## 图像生成
+- [[Flux 部署指南 (Forge)|FLUX.1 部署指南 (Forge)]]
+- [[FLUX.2 部署指南 (ComfyUI)|FLUX.2 部署指南 (ComfyUI)]] — H20 + ComfyUI，推荐方案
+
 ## 优化技术
 - [[模型量化 (GPTQ, AWQ, GGUF)]]
 - [[KV Cache 优化]]

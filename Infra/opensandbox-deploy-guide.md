@@ -176,13 +176,14 @@ API 文档同样可通过 `http://localhost:8080/docs` 访问。
 
 ### 3.7 Minikube 注意事项
 
-| 项目 | 说明 |
-|---|---|
-| 资源分配 | 建议 4 CPU / 8G 内存，本地开发可降低 replica 和 request |
-| 沙箱运行方式 | K8s 模式下沙箱是原生 Pod，不是 Docker 容器 |
-| Pool 预热 | 支持通过 Pool CRD 预创建沙箱 Pod，本地可把 `bufferMin`/`bufferMax` 设小 |
-| 暂停/恢复 | K8s 运行时**不支持** pause/resume API |
-| gVisor 隔离 | 可选，项目提供了 RuntimeClass 配置示例（见 `kubernetes/test/e2e_runtime/gvisor/`） |
+| 项目        | 说明                                                                                                                                                           |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 资源分配      | 建议 4 CPU / 8G 内存，本地开发可降低 replica 和 request                                                                                                                   |
+| 沙箱运行方式    | K8s 模式下沙箱是原生 Pod，不是 Docker 容器                                                                                                                                |
+| Pool 预热   | 支持通过 Pool CRD 预创建沙箱 Pod，本地可把 `bufferMin`/`bufferMax` 设小                                                                                                      |
+| 暂停/恢复     | K8s 运行时**不支持** pause/resume API                                                                                                                              |
+| gVisor 隔离 | 可选，项目提供了 RuntimeClass 配置示例（见 `kubernetes/test/e2e_runtime/gvisor/`）                                                                                          |
+| 宿主机文件共享   | 业务服务跑在宿主机时，需 `minikube mount /path:/path` 将目录同步到节点，sandbox 的 hostPath PVC 才能访问宿主机文件。进程需保持运行，详见 [[OpenSandbox Session 沙箱复用实践#Minikube 本地开发：`minikube mount`]] |
 
 详细 Helm 部署文档见仓库 `kubernetes/docs/HELM-DEPLOYMENT.md`。
 
@@ -341,6 +342,28 @@ TypeError: 'NoneType' object is not iterable
 ```
 
 这是 SDK（v0.1.6）与 Server（v0.1.8）的兼容性 bug。解决方法：使用 REST API 直接调用（见下方端到端验证章节）。
+
+**问题七** ：`minikube mount`
+
+Minikube 节点的文件系统与宿主机**隔离**。PVC 使用 `hostPath` 时，指向的是 minikube 节点内的路径，而不是宿主机的同名路径。如果业务服务跑在宿主机上（而非 minikube 内），需要用 `minikube mount` 将宿主机目录双向同步到节点：
+
+```bash
+# 前台运行，进程必须保持活动
+minikube mount /tmp/chat_review:/tmp/chat_review
+
+# 后台运行
+nohup minikube mount /tmp/chat_review:/tmp/chat_review > /dev/null 2>&1 &
+```
+
+挂载后：
+- 宿主机写入 `/tmp/chat_review/{session_id}/合同.docx` → sandbox 容器内立即可见
+- sandbox 容器写入 `/tmp/chat_review/{session_id}/annotations.json` → 宿主机立即可读
+
+注意事项：
+- `minikube mount` 使用 9p 协议，**进程退出即断开**，需确保在 sandbox 生命周期内保持运行
+- 性能低于原生文件系统，大文件或高频 IO 场景可能有延迟
+- 生产环境不需要此步骤（PVC 直接绑定集群存储）
+
 
 ---
 

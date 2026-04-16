@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "CLAUDE.md",
+                "file": "Infra/FLUX.2 部署指南 (ComfyUI).md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "CLAUDE"
+              "title": "FLUX.2 部署指南 (ComfyUI)"
             }
           }
         ]
@@ -78,7 +78,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 261.5
+    "width": 300.5
   },
   "right": {
     "id": "ed4eaa83d3325dbe",
@@ -185,37 +185,41 @@
   },
   "active": "3145e101795059b8",
   "lastOpenFiles": [
-    "Home.md",
-    "Templates/笔记模板.md",
-    "未命名.base",
-    "Infra/opensandbox-deploy-guide.md",
-    "Infra/Infra MOC.md",
-    "Infra/Docker 网络模式与旁路由.md",
+    "Infra/Flux 部署指南 (Forge).md",
+    "Infra/FLUX.2 部署指南 (ComfyUI).md",
     "Agents & Tools/OpenSandbox Session 沙箱复用实践.md",
-    "Agents & Tools/Agents MOC.md",
+    "Infra/opensandbox-deploy-guide.md",
     "Agents & Tools/OpenSandbox 沙箱后端集成.md",
     "Agents & Tools/Landlock Deep Agents 后端集成.md",
+    "Infra/OpenSandbox 架构.md",
     "Infra/Landlock LSM.md",
+    "Infra/Kubernetes SubPath 与 PVC 创建.md",
+    "Infra/Infra MOC.md",
     "Infra/Deployment MOC.md",
+    "Memory/LLM Memory.md",
+    "Agents & Tools/OpenSandbox 架构.md",
+    "Agents & Tools/coding/deepagents-landlock/tests/test_sandbox.py",
+    "Agents & Tools/coding/deepagents-landlock/tests/test_landlock_integration.py",
+    "Agents & Tools/coding/deepagents-landlock/tests/__init__.py",
+    "Agents & Tools/coding/deepagents-landlock/deepagents_landlock/sandbox.py",
+    "Agents & Tools/coding/deepagents-landlock/deepagents_landlock/provider.py",
+    "Agents & Tools/coding/deepagents-landlock/deepagents_landlock/landlock.py",
+    "Agents & Tools/coding/deepagents-landlock/deepagents_landlock/__init__.py",
+    "Agents & Tools/coding/deepagents-landlock/tests",
+    "Agents & Tools/coding/deepagents-landlock/pyproject.toml",
+    "Agents & Tools/coding/deepagents-landlock/deepagents_landlock",
+    "Agents & Tools/coding/deepagents-landlock/README.md",
+    "Memory/Memory MOC.md",
+    "Prompting/Context Management.md",
+    "Agents & Tools/LLM Memory.md",
+    "CLAUDE.md",
+    "Home.md",
+    "Infra/Docker 网络模式与旁路由.md",
+    "Templates/笔记模板.md",
+    "Agents & Tools/Agents MOC.md",
     "Agents & Tools/Claude Code 凭据存储机制.md",
-    "Infra",
     "Deployment/opensandbox-deploy-guide.md",
     "Deployment/Landlock LSM.md",
-    "Agents & Tools/coding/langchain-opensandbox/test_integration.py",
-    "CLAUDE.md",
-    "Agents & Tools/Landlock Agent 沙箱实践.md",
-    "Agents & Tools/coding/langchain-opensandbox/test_sandbox.py",
-    "Agents & Tools/coding/langchain-opensandbox/pyproject.toml",
-    "Agents & Tools/coding/langchain-opensandbox/__init__.py",
-    "Agents & Tools/coding/langchain-opensandbox/provider.py",
-    "Agents & Tools/coding/langchain-opensandbox/sandbox.py",
-    "Agents & Tools/coding/langchain-opensandbox",
-    "Agents & Tools/coding",
-    "Deployment/Deployment MOC.md",
-    "Frameworks/Deep Agents.md",
-    "Frameworks/Frameworks MOC.md",
-    "Papers/Papers MOC.md",
-    "Templates/工具框架模板.md",
-    "Templates/论文笔记模板.md"
+    "Agents & Tools/Landlock Agent 沙箱实践.md"
   ]
 }

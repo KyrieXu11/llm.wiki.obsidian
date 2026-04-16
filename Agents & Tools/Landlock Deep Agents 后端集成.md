@@ -146,33 +146,105 @@ workspace/.tmp/     → 子进程临时目录（$TMPDIR 指向此处）
 其他所有路径          → 内核拒绝（EACCES）
 ```
 
+## 构造器参数
+
+```python
+LandlockSandbox(
+    workspace: str | Path,                    # 工作目录（绝对路径）
+    sandbox_id: str | None = None,            # 自定义 ID，默认 landlock-<uuid>
+    default_timeout: int = 1800,              # 命令超时，默认 30 分钟
+    extra_ro_paths: list[str] | None = None,  # 额外只读路径
+    extra_rw_paths: list[str] | None = None,  # 额外读写路径
+    enable_landlock: bool | None = None,      # None=自动检测, True=强制, False=禁用
+)
+```
+
+支持 Context Manager，但 **不会自动清理** workspace（需手动 `sandbox.cleanup()`）：
+
+```python
+with LandlockSandbox.create() as sandbox:
+    result = sandbox.execute("echo hello")
+# workspace 仍存在，需手动 sandbox.cleanup()
+```
+
+## Landlock 访问标志与 ABI 版本
+
+`landlock.py` 通过 ctypes 直接调用内核 syscall（零外部依赖），定义了完整的文件系统访问标志：
+
+| 标志组 | 包含权限 | 说明 |
+|--------|---------|------|
+| `FS_READ` | `READ_FILE \| READ_DIR` | 读文件 + 列目录 |
+| `FS_WRITE` | `WRITE_FILE \| MAKE_REG \| MAKE_DIR \| MAKE_SYM` | 写文件 + 创建文件/目录/符号链接 |
+| `FS_READ_WRITE` | `FS_READ \| FS_WRITE \| REMOVE_DIR \| REMOVE_FILE \| TRUNCATE \| REFER` | 完整读写 |
+| `FS_READ_EXECUTE` | `FS_READ \| EXECUTE` | 只读 + 可执行 |
+
+ABI 版本自动协商，适配不同内核：
+
+| ABI 版本 | 内核要求 | 新增能力 |
+|----------|---------|---------|
+| v1 | 5.13+ | 基础 13 种文件系统操作 |
+| v2 | 5.19+ | `FS_REFER`（跨目录 rename/link） |
+| v3 | 6.2+ | `FS_TRUNCATE` |
+
+检测方式：直接尝试 `landlock_create_ruleset` syscall，不依赖内核版本字符串（可能有 backport）。
+
 ## 项目结构
 
 ```
 deepagents-landlock/
 ├── deepagents_landlock/
-│   ├── __init__.py        # 导出 LandlockSandbox
-│   ├── landlock.py        # Landlock syscall 封装（零依赖 ctypes）
-│   ├── sandbox.py         # BaseSandbox 实现（核心）
-│   └── provider.py        # CLI SandboxProvider 实现
+│   ├── __init__.py                # 导出 LandlockSandbox
+│   ├── landlock.py                # Landlock syscall 封装（零依赖 ctypes）
+│   ├── sandbox.py                 # BaseSandbox 实现（核心，363 行）
+│   └── provider.py                # CLI SandboxProvider 实现
 ├── tests/
-│   └── test_sandbox.py    # 28 个单元测试
+│   ├── test_sandbox.py            # 28 个单元测试（任何平台）
+│   └── test_landlock_integration.py  # 21 个集成测试（需 Linux 5.13+）
 ├── pyproject.toml
 └── README.md
 ```
 
-源码位于 `~/tmp/deepagents-landlock/`。
+源码位于 `Agents & Tools/coding/deepagents-landlock/`。
 
 ## 测试
+
+### 单元测试（任何平台）
 
 ```bash
 cd ~/tmp/deepagents-landlock
 python -m pytest tests/test_sandbox.py -v    # 28 passed
 ```
 
-单元测试通过 `enable_landlock=False` 在任何平台运行，验证适配器逻辑：命令执行、stdout/stderr 合并、文件上传下载、路径校验、超时处理、生命周期管理。
+通过 `enable_landlock=False` 在 macOS/任意平台运行，验证适配器逻辑：
 
-Landlock 集成测试需要 Linux 5.13+ 内核环境。
+| 类别 | 数量 | 覆盖内容 |
+|------|------|---------|
+| ID 管理 | 2 | 自动生成、自定义 ID |
+| 命令执行 | 8 | echo、退出码、stderr、合并输出、CWD、多行、超时、环境变量 |
+| 文件上传 | 6 | 单/多文件、嵌套路径、绝对路径、边界校验、二进制数据 |
+| 文件下载 | 4 | 存在/缺失文件、边界校验、多文件 |
+| 往返测试 | 1 | upload → download 一致性 |
+| 集成场景 | 2 | execute 读取上传文件、execute 写入后下载 |
+| 工厂方法 | 2 | 自动/自定义 workspace |
+| 清理 & CM | 2 | cleanup 删目录、Context Manager 不自动清理 |
+
+### 集成测试（需 Linux 5.13+）
+
+```bash
+python -m pytest tests/test_landlock_integration.py -v    # 21 passed
+```
+
+在真实 Landlock 内核上验证隔离效果：
+
+| 类别 | 数量 | 验证内容 |
+|------|------|---------|
+| Landlock 模块 | 3 | `is_supported()` 检测、ABI 版本查询 |
+| 文件系统隔离 | 7 | 不可读 `/root/`、不可写 workspace 外、不可列 `/tmp/`、可读系统库、`/etc/` 只读不可写 |
+| Workspace 操作 | 3 | workspace 内写入、嵌套目录创建、跨命令文件持久 |
+| Upload + Execute | 2 | 上传 shell/Python 脚本并执行 |
+| 子进程继承 | 2 | bash 子进程继承限制、Python subprocess 继承限制 |
+| Extra Paths | 2 | 额外读写路径可用、额外只读路径拒绝写入 |
+| 超时 | 1 | 超时处理 |
 
 ## 参考资料
 

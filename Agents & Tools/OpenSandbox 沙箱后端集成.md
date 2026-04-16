@@ -195,6 +195,7 @@ sandbox.close()   # 释放本地资源
 
 ## 参考资料
 
+- [[OpenSandbox 架构]] — Server / execd / Ingress / Egress 内部架构详解
 - [[Deep Agents]] — 框架详情与沙箱协议
 - [[opensandbox-deploy-guide|OpenSandbox 部署指南]] — 本地部署与配置
 - [OpenSandbox GitHub](https://github.com/alibaba/OpenSandbox)

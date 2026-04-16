@@ -284,7 +284,7 @@ sessions/<session_id>/
 
 - `host` / `hostPath` 更适合单机或开发环境；K8s 多节点生产优先用 `pvc`
 - 如果用 `hostPath`，OpenSandbox 服务端要允许对应的宿主机路径前缀
-- 如果用 `pvc`，PVC 必须预先存在，而且要和 sandbox 在同一 namespace
+- 如果用 `pvc`，PVC 必须预先存在，而且要和 sandbox 在同一 namespace（实际验证中 sandbox pod 运行在 `opensandbox-system` namespace，PVC 需创建在同一 namespace 下）
 - `subPath` 解决的是路径隔离，不解决并发写冲突；同一目录被多个 sandbox 同时读写时，锁和一致性要业务层自己处理
 - 如果你只复用文件，不复用进程内状态，那么 sandbox 挂掉也没关系；新 sandbox 挂回同一 volume 即可继续
 - 如果你还想复用 Python 变量、缓存、已启动进程等内存态，就还需要维护 `session_id -> sandbox_id` 并配合 TTL/续期
