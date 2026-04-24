@@ -24,6 +24,9 @@ tags:
 - [[Claude Code]]
 - [[Claude Code 凭据存储机制]]
 
+## Projects
+- [[cc-webui MOC|cc-webui]] — self-hosted Claude Code web UI；自定义 Bash MCP、刷新续流、停止生成、前后台互转等实践
+
 ## 沙箱集成
 - [[OpenSandbox 沙箱后端集成]]
 - [[OpenSandbox Session 沙箱复用实践]]

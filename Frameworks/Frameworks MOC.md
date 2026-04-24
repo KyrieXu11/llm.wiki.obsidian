@@ -34,3 +34,6 @@ tags:
 ## 相关页面
 - [[Agents MOC|Agent 与工具]]
 - [[Infra MOC|基础设施]]
+
+
+- [[LangGraph astream_events 事件顺序与 tool_call 流式解析]] — astream_events 事件顺序保证、input_json_delta 流式解码、竞态分析

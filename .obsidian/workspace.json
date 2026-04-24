@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Infra/FLUX.2 部署指南 (ComfyUI).md",
+                "file": "Infra/FRP 协议层特征.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "FLUX.2 部署指南 (ComfyUI)"
+              "title": "FRP 协议层特征"
             }
           }
         ]
@@ -185,8 +185,20 @@
   },
   "active": "3145e101795059b8",
   "lastOpenFiles": [
-    "Infra/Flux 部署指南 (Forge).md",
+    "Infra/FRP 隐蔽部署实战.md",
+    "Agents & Tools/Projects/cc-webui/Claude Agent SDK 流式对话断线续流.md",
+    "Infra/FRP 协议层特征.md",
+    "Agents & Tools/Projects/cc-webui/cc-webui MOC.md",
+    "Agents & Tools/Projects/cc-webui/Claude Agent SDK 运行时干预：取消与前后台互转.md",
+    "Agents & Tools/Projects/cc-webui",
+    "Agents & Tools/Projects",
+    "Agents & Tools/Projects/cc-webui/Claude Agent SDK 自定义 Bash MCP.md",
+    "test-probe.md",
+    "Frameworks/LangGraph astream_events 事件顺序与 tool_call 流式解析.md",
+    "Infra/STUN 实现原理.md",
+    "Infra/WebRTC 技术栈调研.md",
     "Infra/FLUX.2 部署指南 (ComfyUI).md",
+    "Infra/Flux 部署指南 (Forge).md",
     "Agents & Tools/OpenSandbox Session 沙箱复用实践.md",
     "Infra/opensandbox-deploy-guide.md",
     "Agents & Tools/OpenSandbox 沙箱后端集成.md",
@@ -206,20 +218,8 @@
     "Agents & Tools/coding/deepagents-landlock/deepagents_landlock/landlock.py",
     "Agents & Tools/coding/deepagents-landlock/deepagents_landlock/__init__.py",
     "Agents & Tools/coding/deepagents-landlock/tests",
-    "Agents & Tools/coding/deepagents-landlock/pyproject.toml",
-    "Agents & Tools/coding/deepagents-landlock/deepagents_landlock",
     "Agents & Tools/coding/deepagents-landlock/README.md",
     "Memory/Memory MOC.md",
-    "Prompting/Context Management.md",
-    "Agents & Tools/LLM Memory.md",
-    "CLAUDE.md",
-    "Home.md",
-    "Infra/Docker 网络模式与旁路由.md",
-    "Templates/笔记模板.md",
-    "Agents & Tools/Agents MOC.md",
-    "Agents & Tools/Claude Code 凭据存储机制.md",
-    "Deployment/opensandbox-deploy-guide.md",
-    "Deployment/Landlock LSM.md",
-    "Agents & Tools/Landlock Agent 沙箱实践.md"
+    "Prompting/Context Management.md"
   ]
 }
